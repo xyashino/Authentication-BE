@@ -4,5 +4,5 @@ export interface UserEntity {
   email: string;
   password: string;
   phone: string;
-  avatar: string;
+  avatar: string | null;
 }

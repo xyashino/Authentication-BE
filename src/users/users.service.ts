@@ -34,7 +34,7 @@ export class UsersService {
 
   async update(id: string, { password, ...restUser }: UpdateUserDto) {
     const user = await this.findOne(id);
-    if (restUser.email) await this.checkEmail(restUser.email);
+    if (restUser?.email) await this.checkEmail(restUser.email);
     this.userRepository.merge(user, restUser);
     if (password) user.password = await this.hashPassword(password);
     return this.userRepository.save(user);
