@@ -1,26 +1,56 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from '@users/entities/user.entity';
+import { hash } from 'bcrypt';
+import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  @Inject(ConfigService)
+  private readonly configService: ConfigService;
+
+  @InjectRepository(User)
+  private readonly userRepository: Repository<User>;
+
+  async create({ email, password, ...restData }: CreateUserDto) {
+    const user = this.userRepository.create(restData);
+    await this.checkEmail(email);
+    user.email = email;
+    user.password = await this.hashPassword(password);
+    return this.userRepository.save(user);
   }
 
   findAll() {
-    return `This action returns all users`;
+    return this.userRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: string) {
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user) throw new Error('User not found');
+    return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: string, { password, ...restUser }: UpdateUserDto) {
+    const user = await this.findOne(id);
+    if (restUser.email) await this.checkEmail(restUser.email);
+    this.userRepository.merge(user, restUser);
+    if (password) user.password = await this.hashPassword(password);
+    return this.userRepository.save(user);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: string) {
+    const user = await this.findOne(id);
+    return this.userRepository.remove(user);
+  }
+
+  private async checkEmail(email: string) {
+    const user = await this.userRepository.findOneBy({ email });
+    if (user) throw new Error('Email already exists');
+  }
+
+  private async hashPassword(password: string) {
+    return hash(password, +this.configService.get<number>('BCRYPT_SALT'));
   }
 }
