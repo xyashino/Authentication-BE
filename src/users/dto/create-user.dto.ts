@@ -1,4 +1,4 @@
-import { UserEntity } from '@types';
+import { UserEntity } from '@/types';
 import {
   IsEmail,
   IsNotEmpty,
