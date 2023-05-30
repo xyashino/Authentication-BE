@@ -7,11 +7,13 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
 import { configServiceMock } from '../../test/mocks/config-service.mock';
+import { UserEntity } from '@/types';
 
 describe('UsersService', () => {
   let service: UsersService;
   let userRepo: Repository<User>;
   let userMock: CreateUserDto;
+  let userMockWithId: CreateUserDto & { id: string };
   let configService: ConfigService;
   const id = '123';
 
@@ -23,10 +25,11 @@ describe('UsersService', () => {
           provide: getRepositoryToken(User),
           useValue: {
             findOneBy: jest.fn(),
-            save: jest.fn(),
+            save: jest.fn().mockImplementation((user) => Promise.resolve(user)),
             create: jest.fn(),
             remove: jest.fn(),
             find: jest.fn(),
+            merge: jest.fn(),
           },
         },
         {
@@ -45,6 +48,8 @@ describe('UsersService', () => {
       name: 'John',
       phone: '123-123-132',
     };
+
+    userMockWithId = { ...userMock, id };
 
     service = module.get<UsersService>(UsersService);
     userRepo = module.get<Repository<User>>(getRepositoryToken(User));
@@ -67,9 +72,7 @@ describe('UsersService', () => {
         .spyOn(bcrypt, 'hash')
         .mockImplementation(() => Promise.resolve(userMock.password));
 
-      saveSpy = jest
-        .spyOn(userRepo, 'save')
-        .mockResolvedValue({ id, ...userMock });
+      saveSpy = jest.spyOn(userRepo, 'save').mockResolvedValue(userMockWithId);
     });
 
     it('should create a user', async () => {
@@ -86,13 +89,13 @@ describe('UsersService', () => {
       );
       expect(userRepo.create).toBeCalledTimes(1);
       expect(saveSpy).toBeCalledTimes(1);
-      expect(user).toEqual({ id, ...userMock });
+      expect(user).toEqual(userMockWithId);
     });
 
     it('should throw an error if email already exists and', async () => {
       const findOneSpy = jest
         .spyOn(userRepo, 'findOneBy')
-        .mockResolvedValue({ id, ...userMock });
+        .mockResolvedValue(userMockWithId);
 
       await expect(service.create(userMock)).rejects.toThrowError();
       expect(findOneSpy).toBeCalledWith({ email: userMock.email });
@@ -104,7 +107,7 @@ describe('UsersService', () => {
 
   describe('findAll', () => {
     it('should return all users', async () => {
-      const users = [{ id, ...userMock }];
+      const users = [userMockWithId];
       const findSpy = jest.spyOn(userRepo, 'find').mockResolvedValue(users);
       expect(await service.findAll()).toEqual(users);
       expect(findSpy).toBeCalledTimes(1);
@@ -118,11 +121,10 @@ describe('UsersService', () => {
 
   describe('findOne', () => {
     it('should return a user', async () => {
-      const user = { id, ...userMock };
       const findOneSpy = jest
         .spyOn(userRepo, 'findOneBy')
-        .mockResolvedValue(user);
-      expect(await service.findOne(id)).toEqual(user);
+        .mockResolvedValue(userMockWithId);
+      expect(await service.findOne(id)).toEqual(userMockWithId);
       expect(findOneSpy).toBeCalledWith({ id });
     });
     it('should throw error if user is not found', async () => {
@@ -138,17 +140,15 @@ describe('UsersService', () => {
     it('should remove a user', async () => {
       const findOneSpy = jest
         .spyOn(userRepo, 'findOneBy')
-        .mockResolvedValue({ id, ...userMock });
-      const removeSpy = jest.spyOn(userRepo, 'remove').mockResolvedValue({
-        id,
-        ...userMock,
-      });
+        .mockResolvedValue(userMockWithId);
+      const removeSpy = jest
+        .spyOn(userRepo, 'remove')
+        .mockImplementation(() => Promise.resolve(userMockWithId));
 
-      expect(await service.remove(id)).toEqual({ id, ...userMock });
+      expect(await service.remove(id)).toEqual(userMockWithId);
       expect(findOneSpy).toBeCalledWith({ id });
       expect(removeSpy).toBeCalledTimes(1);
-      expect(service.findOne).toBeCalledTimes(1);
-      expect(service.findOne).toBeCalledWith({ id });
+      expect(findOneSpy).toBeCalledTimes(1);
     });
     it('should throw error if user is not found', async () => {
       const findOneSpy = jest
@@ -156,45 +156,94 @@ describe('UsersService', () => {
         .mockResolvedValue(undefined);
       await expect(service.remove(id)).rejects.toThrowError();
       expect(findOneSpy).toBeCalledWith({ id });
-      expect(service.findOne).toBeCalledTimes(1);
-      expect(service.findOne).toBeCalledWith({ id });
+      expect(findOneSpy).toBeCalledTimes(1);
       expect(userRepo.remove).toBeCalledTimes(0);
     });
   });
 
   describe('update', () => {
+    const newUserData = { name: 'new name', email: 'new email' };
     it('should update a user', async () => {
       const findOneSpy = jest
         .spyOn(userRepo, 'findOneBy')
-        .mockResolvedValue({ id, ...userMock });
-      const saveSpy = jest.spyOn(userRepo, 'save').mockResolvedValue({
-        id,
-        ...userMock,
-      });
+        .mockImplementation(({ email }: UserEntity) => {
+          if (email) return Promise.resolve(undefined);
+          return Promise.resolve(userMockWithId);
+        });
 
-      expect(
-        await service.update(id, { name: 'new name', email: 'new email' }),
-      ).toEqual({
-        id,
-        ...userMock,
-        ...{ name: 'new name', email: 'new email' },
+      const mergeSpy = jest
+        .spyOn(userRepo, 'merge')
+        .mockImplementation((user, updates: Partial<User>) => {
+          Object.assign(user, updates);
+          return user;
+        });
+
+      expect(await service.update(id, newUserData)).toEqual({
+        ...userMockWithId,
+        ...newUserData,
       });
+      expect(mergeSpy).toBeCalledTimes(1);
+      expect(mergeSpy).toBeCalledWith(userMockWithId, newUserData);
       expect(findOneSpy).toBeCalledWith({ id });
-      expect(saveSpy).toBeCalledTimes(1);
-      expect(service.findOne).toBeCalledTimes(1);
-      expect(service.findOne).toBeCalledWith({ id });
+      expect(findOneSpy).toBeCalledWith({ email: newUserData.email });
+      expect(findOneSpy).toBeCalledTimes(2);
     });
     it('should throw error if user is not found', async () => {
       const findOneSpy = jest
         .spyOn(userRepo, 'findOneBy')
         .mockResolvedValue(undefined);
-      await expect(
-        service.update(id, { name: 'new name', email: 'new email' }),
-      ).rejects.toThrowError();
+      await expect(service.update(id, newUserData)).rejects.toThrowError();
+
       expect(findOneSpy).toBeCalledWith({ id });
-      expect(service.findOne).toBeCalledTimes(1);
-      expect(service.findOne).toBeCalledWith({ id });
+      expect(findOneSpy).toBeCalledTimes(1);
       expect(userRepo.save).toBeCalledTimes(0);
+    });
+
+    it('should throw error if email exist', async () => {
+      const findOneSpy = jest
+        .spyOn(userRepo, 'findOneBy')
+        .mockImplementation((obj: UserEntity) =>
+          Promise.resolve(userMockWithId),
+        );
+
+      await expect(service.update(id, newUserData)).rejects.toThrowError();
+
+      expect(findOneSpy).toBeCalledWith({ id: userMockWithId.id });
+      expect(findOneSpy).toBeCalledWith({ email: newUserData.email });
+      expect(findOneSpy).toBeCalledTimes(2);
+    });
+
+    it('should change password', async () => {
+      const newPassword = '11111111113123123213123';
+      const hashSpy = jest
+        .spyOn(bcrypt, 'hash')
+        .mockImplementation(() => Promise.resolve(newPassword));
+
+      const findOneSpy = jest
+        .spyOn(userRepo, 'findOneBy')
+        .mockImplementation(() => Promise.resolve(userMockWithId));
+
+      const mergeSpy = jest
+        .spyOn(userRepo, 'merge')
+        .mockImplementation((user, updates: Partial<User>) => {
+          Object.assign(user, updates);
+          return user;
+        });
+
+      await expect(
+        service.update(id, { password: newPassword }),
+      ).resolves.toEqual({
+        ...userMockWithId,
+        password: newPassword,
+      });
+      expect(hashSpy).toBeCalledWith(
+        newPassword,
+        +configService.get('BCRYPT_SALT'),
+      );
+      expect(hashSpy).toBeCalledTimes(2);
+      expect(findOneSpy).toBeCalledWith({ id });
+      expect(findOneSpy).toBeCalledTimes(1);
+      expect(mergeSpy).toBeCalledTimes(1);
     });
   });
 });
