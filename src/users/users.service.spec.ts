@@ -202,9 +202,7 @@ describe('UsersService', () => {
     it('should throw error if email exist', async () => {
       const findOneSpy = jest
         .spyOn(userRepo, 'findOneBy')
-        .mockImplementation((obj: UserEntity) =>
-          Promise.resolve(userMockWithId),
-        );
+        .mockImplementation(() => Promise.resolve(userMockWithId));
 
       await expect(service.update(id, newUserData)).rejects.toThrowError();
 
