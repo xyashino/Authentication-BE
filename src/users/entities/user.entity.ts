@@ -1,7 +1,8 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { UserEntity } from '@types';
 
 @Entity()
-export class User {
+export class User implements UserEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
