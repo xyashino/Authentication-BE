@@ -18,6 +18,8 @@ export class User implements UserEntity {
   @Column()
   phone: string;
 
-  @Column()
-  avatar: string;
+  @Column({
+    nullable: true,
+  })
+  avatar: string | null;
 }
