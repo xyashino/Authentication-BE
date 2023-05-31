@@ -7,6 +7,9 @@
     "^.+\\.(t|j)s$": "ts-jest"
   },
   "moduleNameMapper": {
-    "^@/(.*)$": "<rootDir>/../src/$1"
+    "^@/(.*)$": "<rootDir>/../src/$1",
+    "^@interceptors/(.*)$": "<rootDir>/../src/common/interceptors/$1",
+    "^@guards/(.*)$": "<rootDir>/../src/common/guards/$1",
+    "^@decorators/(.*)$": "<rootDir>/../src/common/guards/$1"
   }
 }
