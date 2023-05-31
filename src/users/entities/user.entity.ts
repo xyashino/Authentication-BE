@@ -22,4 +22,10 @@ export class User implements UserEntity {
     nullable: true,
   })
   avatar: string | null;
+
+  @Column({
+    nullable: true,
+    default: null,
+  })
+  currentTokenId: string | null;
 }

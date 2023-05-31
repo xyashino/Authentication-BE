@@ -5,4 +5,5 @@ export interface UserEntity {
   password: string;
   phone: string;
   avatar: string | null;
+  currentTokenId: string | null;
 }
