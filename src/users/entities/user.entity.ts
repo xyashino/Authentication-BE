@@ -1,5 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { UserEntity } from '@/types';
+import { LoginType } from '@/enums/login-type.enum';
 
 @Entity()
 export class User implements UserEntity {
@@ -7,16 +8,21 @@ export class User implements UserEntity {
   id: string;
 
   @Column()
-  name: string;
+  fullName: string;
 
-  @Column()
+  @Column({ unique: true })
   email: string;
 
-  @Column()
-  password: string;
+  @Column({
+    nullable: true,
+    default: null,
+  })
+  hashPwd: string | null;
 
-  @Column()
-  phone: string;
+  @Column({
+    nullable: true,
+  })
+  phone: string | null;
 
   @Column({
     nullable: true,
@@ -28,4 +34,11 @@ export class User implements UserEntity {
     default: null,
   })
   currentTokenId: string | null;
+
+  @Column({
+    type: 'enum',
+    enum: LoginType,
+    default: LoginType.Jwt,
+  })
+  provider: LoginType;
 }
