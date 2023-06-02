@@ -7,30 +7,16 @@ import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '@/users/entities/user.entity';
-import { JwtPayload } from '@/authentication/jwt.strategy';
 import { AuthLoginDto } from '@/authentication/dto/auth-login.dto';
+import { cookieConfig } from '@/config/cookieConfig';
+import { JwtPayload } from '@/authentication/strategy/jwt.strategy';
 
 @Injectable()
 export class AuthService {
-  private readonly cookieConfig: {
-    maxAge: number;
-    domain: string;
-    httpOnly: boolean;
-    secure: boolean;
-  };
-  constructor(
-    @Inject(ConfigService)
-    private readonly configService: ConfigService,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-  ) {
-    this.cookieConfig = {
-      secure: this.configService.get('JWT_PROTOCOL_SECURE') === 'true',
-      domain: this.configService.get<string>('DOMAIN'),
-      httpOnly: this.configService.get('JWT_HTTP_ONLY') === 'true',
-      maxAge: +this.configService.get('JWT_EXPIRES_SECONDS'),
-    };
-  }
+  @Inject(ConfigService)
+  private readonly configService: ConfigService;
+  @InjectRepository(User)
+  private readonly userRepository: Repository<User>;
 
   private createToken(currentTokenId: string): {
     accessToken: string;
@@ -60,7 +46,6 @@ export class AuthService {
     } while (!!userWithThisToken);
 
     user.currentTokenId = token;
-
     await this.userRepository.save(user);
     return token;
   }
@@ -70,14 +55,14 @@ export class AuthService {
       const user = await this.userRepository.findOneBy({ email: req.email });
 
       const matchPwd: boolean =
-        !!user && (await compare(req.password, user.password));
+        !!user && !!user.hashPwd && (await compare(req.password, user.hashPwd));
 
       if (!matchPwd) {
         return res.status(401).json({ error: 'Invalid credentials' });
       }
       const token = this.createToken(await this.generateToken(user));
       return res
-        .cookie('jwt', token.accessToken, this.cookieConfig)
+        .cookie('jwt', token.accessToken, cookieConfig)
         .json({ logged: true, status: 200 });
     } catch (e) {
       return res.json({ error: e.message, status: e.status });
@@ -88,10 +73,16 @@ export class AuthService {
     try {
       user.currentTokenId = null;
       await this.userRepository.save(user);
-      res.clearCookie('jwt', this.cookieConfig);
+      res.clearCookie('jwt', cookieConfig);
       return res.json({ ok: true });
     } catch (e) {
       return res.json({ error: e.message });
     }
+  }
+  async providerLogin(user: User, res: Response) {
+    const token = this.createToken(await this.generateToken(user));
+    return res
+      .cookie('jwt', token.accessToken, cookieConfig)
+      .redirect(this.configService.get<string>('FRONTEND_URL'));
   }
 }
