@@ -1,9 +1,12 @@
+import { LoginType } from '@/enums/login-type.enum';
+
 export interface UserEntity {
   id: string;
-  name: string;
+  fullName: string;
   email: string;
-  password: string;
-  phone: string;
+  hashPwd: string | null;
+  phone: string | null;
   avatar: string | null;
   currentTokenId: string | null;
+  provider: LoginType;
 }
