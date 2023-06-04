@@ -17,6 +17,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { User } from '@/users/entities/user.entity';
 import { UserObj } from '@decorators/user.decorator';
 import { AuthProvidersGuard } from '@/authentication/guards/auth-providers.guard';
+import { Serialize } from '@interceptors/serialization.interceptor';
+import { ResponseUserDto } from '@/users/dto/response-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -35,6 +37,7 @@ export class AuthController {
   }
 
   @Get('me')
+  @Serialize(ResponseUserDto)
   @UseGuards(AuthGuard('jwt'))
   async check(@UserObj() user: User) {
     return user;
