@@ -1,4 +1,4 @@
-import { UserResponse } from '@/types/users/user-response.interface';
+import { UserResponse } from '@/types';
 import { Expose } from 'class-transformer';
 
 export class ResponseUserDto implements UserResponse {
