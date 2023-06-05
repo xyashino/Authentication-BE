@@ -1,5 +1,3 @@
-import { LoginType } from '@/enums/login-type.enum';
-
 export interface UserEntity {
   id: string;
   fullName: string;
@@ -8,5 +6,5 @@ export interface UserEntity {
   phone: string | null;
   avatar: string | null;
   currentTokenId: string | null;
-  provider: LoginType;
+  provider: 'google' | 'facebook' | 'jwt' | 'linkedin' | 'github';
 }

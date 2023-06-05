@@ -20,6 +20,7 @@ export class CreateUserDto implements UserCreate {
   @IsString()
   avatar: string;
 
+  @IsOptional()
   @IsNotEmpty()
   @IsString()
   phone: string;
