@@ -16,4 +16,7 @@ export class ResponseUserDto implements UserResponse {
 
   @Expose()
   phone: string | null;
+
+  @Expose()
+  bio: string | null;
 }

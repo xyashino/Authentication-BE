@@ -4,4 +4,5 @@ export interface UserCreate {
   avatar?: string;
   phone?: string;
   fullName: string;
+  bio?: string;
 }

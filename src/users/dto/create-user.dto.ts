@@ -25,6 +25,11 @@ export class CreateUserDto implements UserCreate {
   @IsString()
   phone: string;
 
+  @IsOptional()
+  @IsNotEmpty()
+  @IsString()
+  bio: string;
+
   @IsNotEmpty()
   @IsString()
   fullName: string;

@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { UserEntity } from '@/types';
+import { UserEntity } from '@/types/users/user-entity.interface';
 import { LoginType } from '@/enums/login-type.enum';
 
 @Entity()
@@ -12,6 +12,9 @@ export class User implements UserEntity {
 
   @Column({ unique: true })
   email: string;
+
+  @Column({ nullable: true })
+  bio: string;
 
   @Column({
     nullable: true,

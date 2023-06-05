@@ -11,11 +11,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '@/users/entities/user.entity';
 import { hash } from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
-import { UserEntity } from '@/types';
+import { UserEntity } from '@/types/users/user-entity.interface';
 
 type CreateProviderUser = Omit<
   UserEntity,
-  'hashPwd' | 'currentTokenId' | 'phone' | 'id' | 'email'
+  'hashPwd' | 'currentTokenId' | 'phone' | 'id' | 'email' | 'bio'
 >;
 @Injectable()
 export class UsersService {

@@ -3,4 +3,5 @@ export interface UserUpdate {
   avatar?: string;
   phone?: string;
   fullName?: string;
+  bio?: string;
 }
