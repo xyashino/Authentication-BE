@@ -11,7 +11,6 @@ export interface JwtPayload {
 }
 
 function cookieExtractor(req: any): null | string {
-  console.log(req);
   return req && req.cookies ? req.cookies?.jwt ?? null : null;
 }
 
