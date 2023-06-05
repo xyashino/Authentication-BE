@@ -1,4 +1,3 @@
-import { UserEntity } from '@/types';
 import {
   IsEmail,
   IsNotEmpty,
@@ -6,8 +5,9 @@ import {
   IsString,
   Length,
 } from 'class-validator';
+import { UserCreate } from '@/types/users/user-create.interface';
 
-export class CreateUserDto implements Partial<UserEntity> {
+export class CreateUserDto implements UserCreate {
   @IsNotEmpty()
   @IsEmail()
   email: string;
@@ -26,5 +26,5 @@ export class CreateUserDto implements Partial<UserEntity> {
 
   @IsNotEmpty()
   @IsString()
-  name: string;
+  fullName: string;
 }
