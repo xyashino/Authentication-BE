@@ -9,7 +9,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '@/users/entities/user.entity';
-import { hash } from 'bcrypt';
+import { hash } from 'bcryptjs';
 import { ConfigService } from '@nestjs/config';
 import { UserEntity } from '@/types/users/user-entity.interface';
 

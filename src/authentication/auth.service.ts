@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Response } from 'express';
-import { compare } from 'bcrypt';
+import { compare } from 'bcryptjs';
 import { randomUUID } from 'crypto';
 import { sign } from 'jsonwebtoken';
 import { Repository } from 'typeorm';
