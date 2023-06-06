@@ -12,6 +12,6 @@ export class AuthProvidersGuard implements CanActivate {
         if (result) return true;
       } catch (error) {}
     }
-    return false;
+    return true;
   }
 }

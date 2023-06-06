@@ -19,11 +19,14 @@ import { UserObj } from '@decorators/user.decorator';
 import { AuthProvidersGuard } from '@/authentication/guards/auth-providers.guard';
 import { Serialize } from '@interceptors/serialization.interceptor';
 import { ResponseUserDto } from '@/users/dto/response-user.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController {
   @Inject(AuthService)
   private readonly authService: AuthService;
+  @Inject(ConfigService)
+  private readonly configService: ConfigService;
 
   @Post('login')
   async login(@Body() req: AuthLoginDto, @Res() res: Response) {
@@ -62,7 +65,8 @@ export class AuthController {
   @UseGuards(AuthProvidersGuard)
   providerCallback(@Request() req, @Res() res: Response) {
     const { user } = req;
-    if (!user) res.json(new UnauthorizedException('Authentication failed'));
+    if (!user)
+      return res.redirect(this.configService.get('AUTH_FAILURE_REDIRECT_URL'));
     return this.authService.providerLogin(user, res);
   }
 }

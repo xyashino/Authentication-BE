@@ -83,6 +83,6 @@ export class AuthService {
     const token = this.createToken(await this.generateToken(user));
     return res
       .cookie('jwt', token.accessToken, cookieConfig)
-      .redirect(this.configService.get<string>('FRONTEND_URL'));
+      .redirect(this.configService.get<string>('AUTH_SUCCESS_REDIRECT_URL'));
   }
 }
