@@ -44,7 +44,8 @@ For this purpose, I have used **[Passport.js](http://www.passportjs.org/)**.
 
 | Method | Endpoint                | Description                          |
 | ------ | ----------------------- | ------------------------------------ |
-|        |                         | **AuthController**                   |
+|                                                                         |
+|                                  **AuthController**                     |
 | POST   | /auth/login             | Allows user to log in.               |
 | DELETE | /auth/logout            | Allows user to log out.              |
 | GET    | /auth/me                | Retrieves the logged-in user's info. |
@@ -53,13 +54,15 @@ For this purpose, I have used **[Passport.js](http://www.passportjs.org/)**.
 | GET    | /auth/linkedin          | Allows user to login via LinkedIn.   |
 | GET    | /auth/facebook          | Allows user to login via Facebook.   |
 | GET    | /auth/provider/callback | Callback for provider login.         |
-|        |                         | **UsersController**                  |
+|                                                                         |
+|                                  **UsersController**                    |
 | POST   | /users                  | Creates a new user.                  |
 | GET    | /users                  | Retrieves all the users.             |
 | GET    | /users/:id              | Retrieves a user by their ID.        |
 | PATCH  | /users/:id              | Updates a user by their ID.          |
 | DELETE | /users/:id              | Deletes a user by their ID.          |
-|        |                         | **UploadController**                 |
+|                                                                         |
+|                                  **UploadController**                   |
 | POST   | /upload/avatar/:userId  | Uploads an avatar for a user.        |
 
 ## Installation
