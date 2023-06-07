@@ -1,73 +1,95 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Authentication App
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+The **Authentication App** is a simple application that facilitates user registration and login through multiple providers:
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+- **Facebook**
+- **Google**
+- **LinkedIn**
+- **GitHub**
 
-## Description
+Moreover, users can log in using their **email** and **password**. They can also **change** their **avatar** (by uploading a new one or providing a URL) and **password**.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+This is a full-stack application. The frontend is developed using **React** and the backend using **Nest.js**. Therefore, I have created two separate repositories:
+
+- [Frontend Repository](https://github.com/xyashino/Authentication-FE.git)
+- [Backend Repository](https://github.com/xyashino/Authentication-BE.git)
+
+## You can find a live demo here: [DEMO](https://authentication.yashino.live/)
+
+```
+email: test@gmail.com
+password: 12345678
+```
+
+The app is deployed on **[MyDevil.net](https://www.mydevil.net/)**.
+
+## Authentication App - Backend
+
+![NestJS](https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
+![NodeJS](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white)
+![MySQL](https://img.shields.io/badge/mysql-%2300f.svg?style=for-the-badge&logo=mysql&logoColor=white)
+
+It is a **REST API** that provides endpoints for user registration and login. It also allows users to log in using their social media accounts
+
+- Facebook
+- Google
+- LinkedIn
+- GitHub
+- Email and password _**(JWT authentication as HTTP cookie)**_
+
+For this purpose, I have used **[Passport.js](http://www.passportjs.org/)**.
+
+# API Documentation
+
+| Method | Endpoint                | Description                          |
+| ------ | ----------------------- | ------------------------------------ |
+|        |                         | **AuthController**                   |
+| POST   | /auth/login             | Allows user to log in.               |
+| DELETE | /auth/logout            | Allows user to log out.              |
+| GET    | /auth/me                | Retrieves the logged-in user's info. |
+| GET    | /auth/github            | Allows user to login via GitHub.     |
+| GET    | /auth/google            | Allows user to login via Google.     |
+| GET    | /auth/linkedin          | Allows user to login via LinkedIn.   |
+| GET    | /auth/facebook          | Allows user to login via Facebook.   |
+| GET    | /auth/provider/callback | Callback for provider login.         |
+|        |                         | **UsersController**                  |
+| POST   | /users                  | Creates a new user.                  |
+| GET    | /users                  | Retrieves all the users.             |
+| GET    | /users/:id              | Retrieves a user by their ID.        |
+| PATCH  | /users/:id              | Updates a user by their ID.          |
+| DELETE | /users/:id              | Deletes a user by their ID.          |
+|        |                         | **UploadController**                 |
+| POST   | /upload/avatar/:userId  | Uploads an avatar for a user.        |
 
 ## Installation
 
-```bash
-$ yarn install
+1. Clone the repository
+
+```
+git clone https://github.com/xyashino/Authentication-BE.git
 ```
 
-## Running the app
+2. Move into the project directory
 
-```bash
-# development
-$ yarn run start
-
-# watch mode
-$ yarn run start:dev
-
-# production mode
-$ yarn run start:prod
+```
+cd Authentication-BE
 ```
 
-## Test
+3. Install dependencies
 
-```bash
-# unit tests
-$ yarn run test
-
-# e2e tests
-$ yarn run test:e2e
-
-# test coverage
-$ yarn run test:cov
+```
+yarn
 ```
 
-## Support
+4. Create a `.env` file in the root directory and copy the contents of `.env.example` into it. Then, fill in the values.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+5. Create a database 6. Run the application
 
-## Stay in touch
+```
+yarn start:dev
+```
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Configuration
 
-## License
-
-Nest is [MIT licensed](LICENSE).
+The application use OAuth 2.0 authentication. Therefore, you need to create a new app on each provider's website and provide the credentials in the `.env` file.
